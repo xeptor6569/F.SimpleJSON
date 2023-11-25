@@ -1424,11 +1424,28 @@ namespace XGE.SimpleJSON
     }
     // End of JSONLazyCreator
 
-    public static class JSON
+        public static partial class JSON
     {
         public static JSONNode Parse(string aJSON)
         {
             return JSONNode.Parse(aJSON);
+        }
+
+        public static bool TryParse(string aJSON, out JSONNode aResult)
+        {
+            try
+            {
+                aResult = JSON.Parse(aJSON);
+                return true;
+            }
+            catch (Exception e)
+            {
+#if UNITY_5_3_OR_NEWER
+                UnityEngine.Debug.LogException(e);
+#endif
+                aResult = null;
+                return false;
+            }
         }
     }
 }
