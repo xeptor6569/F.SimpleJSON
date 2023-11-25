@@ -44,68 +44,82 @@ using UnityEngine;
 namespace XGE.SimpleJSON
 {
     public enum JSONContainerType { Array, Object }
-	public partial class JSONNode
-	{
-        public static byte Color32DefaultAlpha = 255;
-        public static float ColorDefaultAlpha = 1f;
+    public partial class JSONNode
+    {
         public static JSONContainerType VectorContainerType = JSONContainerType.Array;
         public static JSONContainerType QuaternionContainerType = JSONContainerType.Array;
-        public static JSONContainerType RectContainerType = JSONContainerType.Array;
-        public static JSONContainerType ColorContainerType = JSONContainerType.Array;
+        public static JSONContainerType RectContainerType = JSONContainerType.Object;
+        public static JSONContainerType ColorContainerType = JSONContainerType.Object;
         private static JSONNode GetContainer(JSONContainerType aType)
         {
             if (aType == JSONContainerType.Array)
+            {
                 return new JSONArray();
+            }
             return new JSONObject();
         }
 
         #region implicit conversion operators
         public static implicit operator JSONNode(Vector2 aVec)
-		{
+        {
             JSONNode n = GetContainer(VectorContainerType);
             n.WriteVector2(aVec);
-			return n;
-		}
-		public static implicit operator JSONNode(Vector3 aVec)
-		{
+            return n;
+        }
+
+        public static implicit operator JSONNode(Vector3 aVec)
+        {
             JSONNode n = GetContainer(VectorContainerType);
             n.WriteVector3(aVec);
             return n;
         }
+
         public static implicit operator JSONNode(Vector4 aVec)
-		{
+        {
             JSONNode n = GetContainer(VectorContainerType);
             n.WriteVector4(aVec);
             return n;
         }
-        public static implicit operator JSONNode(Color aCol)
-        {
-            JSONNode n = GetContainer(ColorContainerType);
-            n.WriteColor(aCol);
-            return n;
-        }
-        public static implicit operator JSONNode(Color32 aCol)
-        {
-            JSONNode n = GetContainer(ColorContainerType);
-            n.WriteColor32(aCol);
-            return n;
-        }
+
         public static implicit operator JSONNode(Quaternion aRot)
-		{
+        {
             JSONNode n = GetContainer(QuaternionContainerType);
             n.WriteQuaternion(aRot);
             return n;
         }
+
         public static implicit operator JSONNode(Rect aRect)
-		{
+        {
             JSONNode n = GetContainer(RectContainerType);
             n.WriteRect(aRect);
             return n;
         }
+
         public static implicit operator JSONNode(RectOffset aRect)
-		{
+        {
             JSONNode n = GetContainer(RectContainerType);
             n.WriteRectOffset(aRect);
+            return n;
+        }
+
+        public static implicit operator JSONNode(Matrix4x4 aMatrix)
+        {
+            JSONNode n = new JSONArray();
+            n.WriteMatrix(aMatrix);
+            return n;
+        }
+
+        public static implicit operator JSONNode(Color aColor)
+        {
+            JSONNode n = GetContainer(ColorContainerType);
+            n.WriteColor(aColor);
+            return n;
+        }
+
+        public static implicit operator JSONNode(Color32 aColor32)
+        {
+            JSONNode n = GetContainer(ColorContainerType);
+            n.WriteColor32(aColor32);
             return n;
         }
 
@@ -113,45 +127,63 @@ namespace XGE.SimpleJSON
         {
             return aNode.ReadVector2();
         }
+
         public static implicit operator Vector3(JSONNode aNode)
         {
             return aNode.ReadVector3();
         }
+
         public static implicit operator Vector4(JSONNode aNode)
         {
             return aNode.ReadVector4();
         }
-        public static implicit operator Color(JSONNode aNode)
-        {
-            return aNode.ReadColor();
-        }
-        public static implicit operator Color32(JSONNode aNode)
-        {
-            return aNode.ReadColor32();
-        }
+
         public static implicit operator Quaternion(JSONNode aNode)
         {
             return aNode.ReadQuaternion();
         }
+
         public static implicit operator Rect(JSONNode aNode)
         {
             return aNode.ReadRect();
         }
+
         public static implicit operator RectOffset(JSONNode aNode)
         {
             return aNode.ReadRectOffset();
         }
+
+        public static implicit operator Matrix4x4(JSONNode aNode)
+        {
+            return aNode.ReadMatrix();
+        }
+
+        public static implicit operator Color(JSONNode aNode)
+        {
+            return aNode.ReadColor();
+        }
+
+        public static implicit operator Color32(JSONNode aNode)
+        {
+            return aNode.ReadColor32();
+        }
+
         #endregion implicit conversion operators
 
         #region Vector2
         public Vector2 ReadVector2(Vector2 aDefault)
         {
             if (IsObject)
+            {
                 return new Vector2(this["x"].AsFloat, this["y"].AsFloat);
+            }
             if (IsArray)
+            {
                 return new Vector2(this[0].AsFloat, this[1].AsFloat);
+            }
             return aDefault;
         }
+
         public Vector2 ReadVector2(string aXName, string aYName)
         {
             if (IsObject)
@@ -165,8 +197,11 @@ namespace XGE.SimpleJSON
         {
             return ReadVector2(Vector2.zero);
         }
+
         public JSONNode WriteVector2(Vector2 aVec, string aXName = "x", string aYName = "y")
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -176,8 +211,11 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsFloat = aVec.x;
-                this[1].AsFloat = aVec.y;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Add(aVec[i]);
+                }
             }
             return this;
         }
@@ -187,23 +225,34 @@ namespace XGE.SimpleJSON
         public Vector3 ReadVector3(Vector3 aDefault)
         {
             if (IsObject)
+            {
                 return new Vector3(this["x"].AsFloat, this["y"].AsFloat, this["z"].AsFloat);
+            }
             if (IsArray)
+            {
                 return new Vector3(this[0].AsFloat, this[1].AsFloat, this[2].AsFloat);
+            }
             return aDefault;
         }
+
         public Vector3 ReadVector3(string aXName, string aYName, string aZName)
         {
             if (IsObject)
+            {
                 return new Vector3(this[aXName].AsFloat, this[aYName].AsFloat, this[aZName].AsFloat);
+            }
             return Vector3.zero;
         }
+
         public Vector3 ReadVector3()
         {
             return ReadVector3(Vector3.zero);
         }
+
         public JSONNode WriteVector3(Vector3 aVec, string aXName = "x", string aYName = "y", string aZName = "z")
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -214,9 +263,10 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsFloat = aVec.x;
-                this[1].AsFloat = aVec.y;
-                this[2].AsFloat = aVec.z;
+                for (int i = 0; i < 3; i++)
+                {
+                    Add(aVec[i]);
+                }
             }
             return this;
         }
@@ -226,17 +276,25 @@ namespace XGE.SimpleJSON
         public Vector4 ReadVector4(Vector4 aDefault)
         {
             if (IsObject)
+            {
                 return new Vector4(this["x"].AsFloat, this["y"].AsFloat, this["z"].AsFloat, this["w"].AsFloat);
+            }
             if (IsArray)
+            {
                 return new Vector4(this[0].AsFloat, this[1].AsFloat, this[2].AsFloat, this[3].AsFloat);
+            }
             return aDefault;
         }
+
         public Vector4 ReadVector4()
         {
             return ReadVector4(Vector4.zero);
         }
+
         public JSONNode WriteVector4(Vector4 aVec)
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -248,99 +306,39 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsFloat = aVec.x;
-                this[1].AsFloat = aVec.y;
-                this[2].AsFloat = aVec.z;
-                this[3].AsFloat = aVec.w;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    Add(aVec[i]);
+                }
             }
             return this;
         }
         #endregion Vector4
 
-        #region Color / Color32
-        public Color ReadColor(Color aDefault)
-        {
-            if (IsObject)
-                return new Color(this["r"].AsFloat, this["g"].AsFloat, this["b"].AsFloat, HasKey("a")?this["a"].AsFloat:ColorDefaultAlpha);
-            if (IsArray)
-                return new Color(this[0].AsFloat, this[1].AsFloat, this[2].AsFloat, (Count>3)?this[3].AsFloat:ColorDefaultAlpha);
-            return aDefault;
-        }
-        public Color ReadColor()
-        {
-            return ReadColor(Color.clear);
-        }
-        public JSONNode WriteColor(Color aCol)
-        {
-            if (IsObject)
-            {
-                Inline = true;
-                this["r"].AsFloat = aCol.r;
-                this["g"].AsFloat = aCol.g;
-                this["b"].AsFloat = aCol.b;
-                this["a"].AsFloat = aCol.a;
-            }
-            else if (IsArray)
-            {
-                Inline = true;
-                this[0].AsFloat = aCol.r;
-                this[1].AsFloat = aCol.g;
-                this[2].AsFloat = aCol.b;
-                this[3].AsFloat = aCol.a;
-            }
-            return this;
-        }
-
-        public Color32 ReadColor32(Color32 aDefault)
-        {
-            if (IsObject)
-                return new Color32((byte)this["r"].AsInt, (byte)this["g"].AsInt, (byte)this["b"].AsInt, (byte)(HasKey("a")?this["a"].AsInt:Color32DefaultAlpha));
-            if (IsArray)
-                return new Color32((byte)this[0].AsInt, (byte)this[1].AsInt, (byte)this[2].AsInt, (byte)((Count>3)?this[3].AsInt:Color32DefaultAlpha));
-            return aDefault;
-        }
-        public Color32 ReadColor32()
-        {
-            return ReadColor32(new Color32());
-        }
-        public JSONNode WriteColor32(Color32 aCol)
-        {
-            if (IsObject)
-            {
-                Inline = true;
-                this["r"].AsInt = aCol.r;
-                this["g"].AsInt = aCol.g;
-                this["b"].AsInt = aCol.b;
-                this["a"].AsInt = aCol.a;
-            }
-            else if (IsArray)
-            {
-                Inline = true;
-                this[0].AsInt = aCol.r;
-                this[1].AsInt = aCol.g;
-                this[2].AsInt = aCol.b;
-                this[3].AsInt = aCol.a;
-            }
-            return this;
-        }
-
-        #endregion Color / Color32
-
         #region Quaternion
         public Quaternion ReadQuaternion(Quaternion aDefault)
         {
             if (IsObject)
+            {
                 return new Quaternion(this["x"].AsFloat, this["y"].AsFloat, this["z"].AsFloat, this["w"].AsFloat);
+            }
             if (IsArray)
+            {
                 return new Quaternion(this[0].AsFloat, this[1].AsFloat, this[2].AsFloat, this[3].AsFloat);
+            }
             return aDefault;
         }
+
         public Quaternion ReadQuaternion()
         {
             return ReadQuaternion(Quaternion.identity);
         }
+
         public JSONNode WriteQuaternion(Quaternion aRot)
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -352,10 +350,11 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsFloat = aRot.x;
-                this[1].AsFloat = aRot.y;
-                this[2].AsFloat = aRot.z;
-                this[3].AsFloat = aRot.w;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    Add(aRot[i]);
+                }
             }
             return this;
         }
@@ -365,17 +364,25 @@ namespace XGE.SimpleJSON
         public Rect ReadRect(Rect aDefault)
         {
             if (IsObject)
+            {
                 return new Rect(this["x"].AsFloat, this["y"].AsFloat, this["width"].AsFloat, this["height"].AsFloat);
+            }
             if (IsArray)
+            {
                 return new Rect(this[0].AsFloat, this[1].AsFloat, this[2].AsFloat, this[3].AsFloat);
+            }
             return aDefault;
         }
+
         public Rect ReadRect()
         {
             return ReadRect(new Rect());
         }
+
         public JSONNode WriteRect(Rect aRect)
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -387,10 +394,10 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsFloat = aRect.x;
-                this[1].AsFloat = aRect.y;
-                this[2].AsFloat = aRect.width;
-                this[3].AsFloat = aRect.height;
+                Add(aRect.x);
+                Add(aRect.y);
+                Add(aRect.width);
+                Add(aRect.height);
             }
             return this;
         }
@@ -400,17 +407,25 @@ namespace XGE.SimpleJSON
         public RectOffset ReadRectOffset(RectOffset aDefault)
         {
             if (this is JSONObject)
+            {
                 return new RectOffset(this["left"].AsInt, this["right"].AsInt, this["top"].AsInt, this["bottom"].AsInt);
+            }
             if (this is JSONArray)
+            {
                 return new RectOffset(this[0].AsInt, this[1].AsInt, this[2].AsInt, this[3].AsInt);
+            }
             return aDefault;
         }
+
         public RectOffset ReadRectOffset()
         {
             return ReadRectOffset(new RectOffset());
         }
+
         public JSONNode WriteRectOffset(RectOffset aRect)
         {
+            Clear();
+
             if (IsObject)
             {
                 Inline = true;
@@ -422,10 +437,10 @@ namespace XGE.SimpleJSON
             else if (IsArray)
             {
                 Inline = true;
-                this[0].AsInt = aRect.left;
-                this[1].AsInt = aRect.right;
-                this[2].AsInt = aRect.top;
-                this[3].AsInt = aRect.bottom;
+                Add(aRect.left);
+                Add(aRect.right);
+                Add(aRect.top);
+                Add(aRect.bottom);
             }
             return this;
         }
@@ -444,19 +459,166 @@ namespace XGE.SimpleJSON
             }
             return result;
         }
+
         public JSONNode WriteMatrix(Matrix4x4 aMatrix)
         {
+            Clear();
+
             if (IsArray)
             {
                 Inline = true;
                 for (int i = 0; i < 16; i++)
                 {
-                    this[i].AsFloat = aMatrix[i];
+                    Add(aMatrix[i]);
                 }
             }
             return this;
         }
         #endregion Matrix4x4
+
+        #region Color
+        public Color ReadColor()
+        {
+            if (IsString && ColorUtility.TryParseHtmlString(Value, out Color htmlColor))
+            {
+                return htmlColor;
+            }
+
+            if (IsArray)
+            {
+                return ReadVector4();
+            }
+
+            if (IsObject)
+            {
+                return new Color(this["r"].AsFloat, this["g"].AsFloat, this["b"].AsFloat, this["a"].AsFloat);
+            }
+
+            return Color.white;
+        }
+
+        public JSONNode WriteColor(Color aColor)
+        {
+            Clear();
+
+            if (IsString)
+            {
+                Value = $"#{ColorUtility.ToHtmlStringRGBA(aColor)}";
+            }
+            else if (IsObject)
+            {
+                Inline = true;
+                this["r"].AsFloat = aColor.r;
+                this["g"].AsFloat = aColor.g;
+                this["b"].AsFloat = aColor.b;
+                this["a"].AsFloat = aColor.a;
+            }
+            else if (IsArray)
+            {
+                WriteVector4(aColor);
+            }
+
+            return this;
+        }
+        #endregion Color
+
+        #region Color32
+        public Color32 ReadColor32()
+        {
+            if (IsString && ColorUtility.TryParseHtmlString(Value, out Color htmlColor))
+            {
+                return htmlColor;
+            }
+
+            if (IsArray)
+            {
+                return new Color32(this[0].AsByte, this[1].AsByte, this[2].AsByte, this[3].AsByte);
+            }
+
+            if (IsObject)
+            {
+                return new Color32(this["r"].AsByte, this["g"].AsByte, this["b"].AsByte, this["a"].AsByte);
+            }
+
+            return Color.white;
+        }
+
+        public JSONNode WriteColor32(Color32 aColor32)
+        {
+            Clear();
+
+            if (IsString)
+            {
+                Value = $"#{ColorUtility.ToHtmlStringRGBA(aColor32)}";
+            }
+            else if (IsObject)
+            {
+                Inline = true;
+                this["r"].AsByte = aColor32.r;
+                this["g"].AsByte = aColor32.g;
+                this["b"].AsByte = aColor32.b;
+                this["a"].AsByte = aColor32.a;
+            }
+            else if (IsArray)
+            {
+                Add(aColor32.r);
+                Add(aColor32.g);
+                Add(aColor32.b);
+                Add(aColor32.a);
+            }
+
+            return this;
+        }
+        #endregion Color32
+
+        #region Pose
+        public static implicit operator JSONNode(Pose aPose)
+        {
+            JSONNode n = new JSONObject();
+            n.WritePose(aPose);
+            return n;
+        }
+
+        public static implicit operator Pose(JSONNode aNode)
+        {
+            return aNode.ReadPose();
+        }
+
+        public Pose ReadPose()
+        {
+            if (IsObject)
+            {
+                return new Pose(this["position"].ReadVector3(),
+                    this["rotation"].ReadQuaternion());
+            }
+            if (IsArray)
+            {
+                return new Pose(this[0].ReadVector3(),
+                    this[1].ReadQuaternion());
+            }
+
+            return new Pose();
+        }
+
+        public JSONNode WritePose(Pose aPose)
+        {
+            Clear();
+
+            if (IsObject)
+            {
+                this["position"] = aPose.position;
+                this["rotation"] = aPose.rotation;
+            }
+            else if (IsArray)
+            {
+                Add(aPose.position);
+                Add(aPose.rotation);
+            }
+
+            return this;
+        }
+
+        #endregion Pose
     }
 }
 #endif

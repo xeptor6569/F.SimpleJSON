@@ -64,16 +64,17 @@ namespace XGE.SimpleJSON
 				gzipOut.Close();
 			}
 		}
- 
+
 		public void SaveToCompressedFile(string aFileName)
 		{
- 
+
 			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
 			using(var F = System.IO.File.OpenWrite(aFileName))
 			{
 				SaveToCompressedStream(F);
 			}
 		}
+
 		public string SaveToCompressedBase64()
 		{
 			using (var stream = new System.IO.MemoryStream())
@@ -83,7 +84,7 @@ namespace XGE.SimpleJSON
 				return System.Convert.ToBase64String(stream.ToArray());
 			}
 		}
- 
+
 #else
         public void SaveToCompressedStream(System.IO.Stream aData)
         {
@@ -146,25 +147,15 @@ namespace XGE.SimpleJSON
                         return tmp;
                     }
                 case JSONNodeType.String:
-                    {
-                        return new JSONString(aReader.ReadString());
-                    }
+                    return new JSONString(aReader.ReadString());
                 case JSONNodeType.Number:
-                    {
-                        return new JSONNumber(aReader.ReadDouble());
-                    }
+                    return new JSONNumber(aReader.ReadDouble());
                 case JSONNodeType.Boolean:
-                    {
-                        return new JSONBool(aReader.ReadBoolean());
-                    }
+                    return new JSONBool(aReader.ReadBoolean());
                 case JSONNodeType.NullValue:
-                    {
-                        return JSONNull.CreateOrGet();
-                    }
+                    return JSONNull.CreateOrGet();
                 default:
-                    {
-                        throw new Exception("Error deserializing JSON. Unknown tag: " + type);
-                    }
+                    throw new Exception("Error deserializing JSON. Unknown tag: " + type);
             }
         }
 
@@ -174,6 +165,7 @@ namespace XGE.SimpleJSON
 			var zin = new ICSharpCode.SharpZipLib.BZip2.BZip2InputStream(aData);
 			return LoadFromBinaryStream(zin);
 		}
+
 		public static JSONNode LoadFromCompressedFile(string aFileName)
 		{
 			using(var F = System.IO.File.OpenRead(aFileName))
@@ -181,6 +173,7 @@ namespace XGE.SimpleJSON
 				return LoadFromCompressedStream(F);
 			}
 		}
+
 		public static JSONNode LoadFromCompressedBase64(string aBase64)
 		{
 			var tmp = System.Convert.FromBase64String(aBase64);
@@ -283,6 +276,7 @@ namespace XGE.SimpleJSON
             aWriter.Write(m_Data);
         }
     }
+
     public partial class JSONNull : JSONNode
     {
         public override void SerializeBinary(System.IO.BinaryWriter aWriter)
@@ -290,6 +284,7 @@ namespace XGE.SimpleJSON
             aWriter.Write((byte)JSONNodeType.NullValue);
         }
     }
+
     internal partial class JSONLazyCreator : JSONNode
     {
         public override void SerializeBinary(System.IO.BinaryWriter aWriter)

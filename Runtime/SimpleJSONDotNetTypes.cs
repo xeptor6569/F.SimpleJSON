@@ -49,9 +49,10 @@ namespace XGE.SimpleJSON
         {
             get
             {
-                decimal result;
-                if (!decimal.TryParse(Value, out result))
+                if (!decimal.TryParse(Value, out decimal result))
+                {
                     result = 0;
+                }
                 return result;
             }
             set
@@ -77,17 +78,25 @@ namespace XGE.SimpleJSON
             get
             {
                 if (IsString && Value.Length > 0)
+                {
                     return Value[0];
+                }
                 if (IsNumber)
+                {
                     return (char)AsInt;
+                }
                 return '\0';
             }
             set
             {
                 if (IsString)
+                {
                     Value = value.ToString();
+                }
                 else if (IsNumber)
+                {
                     AsInt = (int)value;
+                }
             }
         }
 
@@ -100,7 +109,7 @@ namespace XGE.SimpleJSON
         {
             return aNode.AsChar;
         }
-        #endregion Decimal
+        #endregion Char
 
         #region UInt
         public virtual uint AsUInt
@@ -149,6 +158,7 @@ namespace XGE.SimpleJSON
             return aNode.AsByte;
         }
         #endregion Byte
+
         #region SByte
         public virtual sbyte AsSByte
         {
@@ -196,6 +206,7 @@ namespace XGE.SimpleJSON
             return aNode.AsShort;
         }
         #endregion Short
+
         #region UShort
         public virtual ushort AsUShort
         {
@@ -225,20 +236,21 @@ namespace XGE.SimpleJSON
         {
             get
             {
-                System.DateTime result;
-                if (!System.DateTime.TryParse(Value, CultureInfo.InvariantCulture, DateTimeStyles.None, out result))
+                if (!System.DateTime.TryParse(Value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out System.DateTime result))
+                {
                     result = new System.DateTime(0);
+                }
                 return result;
             }
             set
             {
-                Value = value.ToString(CultureInfo.InvariantCulture);
+                Value = value.ToString("O");
             }
         }
 
         public static implicit operator JSONNode(System.DateTime aDateTime)
         {
-            return new JSONString(aDateTime.ToString(CultureInfo.InvariantCulture));
+            return new JSONString(aDateTime.ToString("O"));
         }
 
         public static implicit operator System.DateTime(JSONNode aNode)
@@ -246,14 +258,16 @@ namespace XGE.SimpleJSON
             return aNode.AsDateTime;
         }
         #endregion DateTime
+
         #region TimeSpan
         public virtual System.TimeSpan AsTimeSpan
         {
             get
             {
-                System.TimeSpan result;
-                if (!System.TimeSpan.TryParse(Value, CultureInfo.InvariantCulture, out result))
+                if (!System.TimeSpan.TryParse(Value, CultureInfo.InvariantCulture, out System.TimeSpan result))
+                {
                     result = new System.TimeSpan(0);
+                }
                 return result;
             }
             set
@@ -278,8 +292,7 @@ namespace XGE.SimpleJSON
         {
             get
             {
-                System.Guid result;
-                System.Guid.TryParse(Value, out result);
+                System.Guid.TryParse(Value, out System.Guid result);
                 return result;
             }
             set
@@ -304,21 +317,29 @@ namespace XGE.SimpleJSON
         {
             get
             {
-                if (this.IsNull || !this.IsArray)
+                if (IsNull || !IsArray)
+                {
                     return null;
+                }
                 int count = Count;
                 byte[] result = new byte[count];
                 for (int i = 0; i < count; i++)
+                {
                     result[i] = this[i].AsByte;
+                }
                 return result;
             }
             set
             {
                 if (!IsArray || value == null)
+                {
                     return;
+                }
                 Clear();
                 for (int i = 0; i < value.Length; i++)
+                {
                     Add(value[i]);
+                }
             }
         }
 
@@ -332,26 +353,35 @@ namespace XGE.SimpleJSON
             return aNode.AsByteArray;
         }
         #endregion ByteArray
+
         #region ByteList
         public virtual List<byte> AsByteList
         {
             get
             {
-                if (this.IsNull || !this.IsArray)
+                if (IsNull || !IsArray)
+                {
                     return null;
+                }
                 int count = Count;
                 List<byte> result = new List<byte>(count);
                 for (int i = 0; i < count; i++)
+                {
                     result.Add(this[i].AsByte);
+                }
                 return result;
             }
             set
             {
                 if (!IsArray || value == null)
+                {
                     return;
+                }
                 Clear();
                 for (int i = 0; i < value.Count; i++)
+                {
                     Add(value[i]);
+                }
             }
         }
 
@@ -360,7 +390,7 @@ namespace XGE.SimpleJSON
             return new JSONArray { AsByteList = aByteList };
         }
 
-        public static implicit operator List<byte> (JSONNode aNode)
+        public static implicit operator List<byte>(JSONNode aNode)
         {
             return aNode.AsByteList;
         }
@@ -371,21 +401,29 @@ namespace XGE.SimpleJSON
         {
             get
             {
-                if (this.IsNull || !this.IsArray)
+                if (IsNull || !IsArray)
+                {
                     return null;
+                }
                 int count = Count;
                 string[] result = new string[count];
                 for (int i = 0; i < count; i++)
+                {
                     result[i] = this[i].Value;
+                }
                 return result;
             }
             set
             {
                 if (!IsArray || value == null)
+                {
                     return;
+                }
                 Clear();
                 for (int i = 0; i < value.Length; i++)
+                {
                     Add(value[i]);
+                }
             }
         }
 
@@ -394,31 +432,40 @@ namespace XGE.SimpleJSON
             return new JSONArray { AsStringArray = aStringArray };
         }
 
-        public static implicit operator string[] (JSONNode aNode)
+        public static implicit operator string[](JSONNode aNode)
         {
             return aNode.AsStringArray;
         }
         #endregion StringArray
+
         #region StringList
         public virtual List<string> AsStringList
         {
             get
             {
-                if (this.IsNull || !this.IsArray)
+                if (IsNull || !IsArray)
+                {
                     return null;
+                }
                 int count = Count;
                 List<string> result = new List<string>(count);
                 for (int i = 0; i < count; i++)
+                {
                     result.Add(this[i].Value);
+                }
                 return result;
             }
             set
             {
                 if (!IsArray || value == null)
+                {
                     return;
+                }
                 Clear();
                 for (int i = 0; i < value.Count; i++)
+                {
                     Add(value[i]);
+                }
             }
         }
 
@@ -427,7 +474,7 @@ namespace XGE.SimpleJSON
             return new JSONArray { AsStringList = aStringList };
         }
 
-        public static implicit operator List<string> (JSONNode aNode)
+        public static implicit operator List<string>(JSONNode aNode)
         {
             return aNode.AsStringList;
         }
@@ -437,78 +484,108 @@ namespace XGE.SimpleJSON
         public static implicit operator JSONNode(int? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONNumber((int)aValue);
         }
+
         public static implicit operator int?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsInt;
         }
 
         public static implicit operator JSONNode(float? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONNumber((float)aValue);
         }
-        public static implicit operator float? (JSONNode aNode)
+
+        public static implicit operator float?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsFloat;
         }
 
         public static implicit operator JSONNode(double? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONNumber((double)aValue);
         }
-        public static implicit operator double? (JSONNode aNode)
+
+        public static implicit operator double?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsDouble;
         }
 
         public static implicit operator JSONNode(bool? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONBool((bool)aValue);
         }
-        public static implicit operator bool? (JSONNode aNode)
+
+        public static implicit operator bool?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsBool;
         }
 
         public static implicit operator JSONNode(long? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONNumber((long)aValue);
         }
-        public static implicit operator long? (JSONNode aNode)
+
+        public static implicit operator long?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsLong;
         }
 
         public static implicit operator JSONNode(short? aValue)
         {
             if (aValue == null)
+            {
                 return JSONNull.CreateOrGet();
+            }
             return new JSONNumber((short)aValue);
         }
-        public static implicit operator short? (JSONNode aNode)
+
+        public static implicit operator short?(JSONNode aNode)
         {
             if (aNode == null || aNode.IsNull)
+            {
                 return null;
+            }
             return aNode.AsShort;
         }
         #endregion NullableTypes
