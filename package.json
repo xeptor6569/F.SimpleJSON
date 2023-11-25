@@ -1,17 +1,17 @@
 {
-  "name": "com.github.bunny83.simplejson",
-  "version": "1.0.1",
+  "name": "com.github.xeptor6569.f.simplejson",
+  "version": "1.0.1-exp.3",
   "displayName": "SimpleJSON",
-  "description": "JSON Parser (A simple one)",
-  "unity": "2018.4",
+  "description": "JSON Parser (A simple one)\nOriginal Author: Markus G\u00f6bel\n\tURL: https://github.com/Bunny83",
+  "unity": "2021.3",
   "keywords": [
     "utilities",
     "JSON"
   ],
   "author": {
-    "name": "Markus G\u00f6bel",
-    "email": "",
-    "url": "https://github.com/Bunny83"
+    "name": "Xeption Games",
+    "email": "xeptiongames@gmail.com",
+    "url": "https://github.com/xeptor6569"
   },
   "type": "library"
 }
